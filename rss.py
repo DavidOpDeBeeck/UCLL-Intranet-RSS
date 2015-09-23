@@ -1,9 +1,10 @@
 import mechanize
 import argparse
-from datetime import datetime
 from bs4 import BeautifulSoup
+from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
+# Command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-username', help='UCLL username')
 parser.add_argument('-password', help='UCLL password')
@@ -38,21 +39,19 @@ br.submit()
 br.select_form(nr=0)
 br.submit()
 
-soup = BeautifulSoup(br.open('https://intranet.ucll.be/newsmessages').read(), "html.parser")
-notices = soup.find('div', {'class': 'view-dringende-berichten-nieuwsberichten'}).find_all('h2')
-notices_dates = soup.find_all('div', {'class': 'field--name-post-date'})
-
+# XML Elements
 rss = Element('rss')
+rss.set('version', '2.0')
 channel = SubElement(rss, 'channel')
 
-channel_item_title = SubElement(channel, 'title')
-channel_item_title.text = 'UCLL Nieuwsberichten'
+channel_title = SubElement(channel, 'title')
+channel_title.text = 'UCLL Nieuwsberichten'
 
-channel_item_description = SubElement(channel, 'description')
-channel_item_description.text = 'UC Leuven-Limburg : Nieuwsberichten'
+channel_description = SubElement(channel, 'description')
+channel_description.text = 'UC Leuven-Limburg : Nieuwsberichten'
 
-channel_item_link = SubElement(channel, 'link')
-channel_item_link.text = 'https://intranet.ucll.be/newsmessages'
+channel_link = SubElement(channel, 'link')
+channel_link.text = 'https://intranet.ucll.be/newsmessages'
 
 channel_language = SubElement(channel, 'language')
 channel_language.text = 'nl-be'
@@ -69,34 +68,59 @@ channel_publish_date.text = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
 channel_last_build_date = SubElement(channel, 'lastBuildDate')
 channel_last_build_date.text = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
 
-for notice_index, notice in enumerate(notices):
-    if notice.a is not None and notice.a.get('href') != "/newsmessages":
-        link = 'https://intranet.ucll.be' + notice.a.get('href')
+# HTML identifiers
 
-        channel_item = SubElement(channel, 'item')
+MESSAGES_URL = 'https://intranet.ucll.be/newsmessages'
+MESSAGES_DIV_CLASS = 'view-dringende-berichten-nieuwsberichten'
+MESSAGES_DATE_DIV_CLASS = 'field--name-post-date'
 
-        channel_item_title = SubElement(channel_item, 'title')
-        channel_item_title.text = notice.a.text
+MESSAGE_PREFIX_URL = 'https://intranet.ucll.be'
+MESSAGE_AUTHOR_CLASS = 'field--name-field-contact'
 
-        channel_item_link = SubElement(channel_item, 'link')
-        channel_item_link.text = link
+PAGE_UL_CLASS = 'pager'
+PAGE_LI_CLASS = 'pager__item'
 
-        soup = BeautifulSoup(br.open(link).read(), "html.parser")
-        paragraphs = soup.find('article').find_all('p')
-        author = soup.find('div', {'class': 'field--name-field-contact'}).a.text
+# HTML parsing
+messages_html = BeautifulSoup(br.open(MESSAGES_URL).read(), "html.parser")
+pages_li = messages_html.find('ul', {'class': PAGE_UL_CLASS}).find_all('li', {'class': PAGE_LI_CLASS})
 
-        channel_item_description = SubElement(channel_item, 'link')
-        channel_item_description.text = ''
-        for paragraph in paragraphs:
-            channel_item_description.text += str(paragraph).decode("utf8")
+for page_index in enumerate(pages_li[:-2]):
+    messages_html = BeautifulSoup(br.open(MESSAGES_URL + '?page=' + str(page_index)).read(), "html.parser")
+    messages_h2 = messages_html.find('div', {'class': MESSAGES_DIV_CLASS}).find_all('h2')
+    messages_date_div = messages_html.find_all('div', {'class': MESSAGES_DATE_DIV_CLASS})
 
-        publish_date = str(notices_dates[notice_index].find('div').find('div').text)[1:-1]
-        channel_publish_date = SubElement(channel_item, 'pubDate')
-        channel_publish_date.text = datetime.strptime(publish_date, '%d-%m-%Y').strftime("%a, %d %b %Y %H:%M:%S %z")
+    for messages_h2_index, message_h2_element in enumerate(messages_h2):
+        if message_h2_element.a is not None:
+            message_link = MESSAGE_PREFIX_URL + message_h2_element.a.get('href')
+            message_html = BeautifulSoup(br.open(message_link).read(), "html.parser")
+            message_publish_date = str(messages_date_div[messages_h2_index].find('div').find('div').text)[1:-1]
+            message_paragraphs = message_html.find('article').find_all('p')
+            message_author = message_html.find('div', {'class': MESSAGE_AUTHOR_CLASS}).a.text
 
-        channel_item_author = SubElement(channel_item, 'author')
-        channel_item_author.text = author
+            channel_item = SubElement(channel, 'item')
 
-rss_file = open("rss.xml", 'w')
+            channel_item_title = SubElement(channel_item, 'title')
+            channel_item_title.text = message_h2_element.a.text
+
+            channel_item_link = SubElement(channel_item, 'link')
+            channel_item_link.text = message_link
+
+            channel_item_description = SubElement(channel_item, 'description')
+            channel_item_description.text = ''
+            for paragraph in message_paragraphs:
+                channel_item_description.text += str(paragraph).decode("utf8")
+
+            channel_item_guid = SubElement(channel_item, 'guid')
+            channel_item_guid.text = message_link
+
+            channel_item_publish_date = SubElement(channel_item, 'pubDate')
+            channel_item_publish_date.text = datetime.strptime(message_publish_date, '%d-%m-%Y')\
+                .strftime("%a, %d %b %Y %H:%M:%S %z")
+
+            channel_item_author = SubElement(channel_item, 'author')
+            channel_item_author.text = message_author
+
+# Save XML to RSS file
+rss_file = open("ucll.xml", 'w')
 rss_file.write(tostring(rss))
 rss_file.close()
