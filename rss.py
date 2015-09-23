@@ -82,9 +82,13 @@ MESSAGES_DATE_DIV_CLASS = 'field--name-post-date'
 
 MESSAGE_PREFIX_URL = 'https://intranet.ucll.be'
 MESSAGE_AUTHOR_CLASS = 'field--name-field-contact'
+MESSAGE_ATTACHMENTS_CLASS = 'field--name-field-nieuws-bijlage'
+MESSAGE_NEED_TO_KNOW_CLASS = 'field--name-field-nieuws-need-to-know'
 
 PAGE_UL_CLASS = 'pager'
 PAGE_LI_CLASS = 'pager__item'
+
+IMAGE_PREFIX = 'https://intranet.ucll.be'
 
 # HTML parsing
 messages_html = BeautifulSoup(br.open(MESSAGES_URL).read(), "html.parser")
@@ -102,6 +106,8 @@ for page_element in enumerate(pages_li[:-2]):
             message_publish_date = str(messages_date_div[messages_h2_index].find('div').find('div').text)[1:-1]
             message_paragraphs = message_html.find('article').find_all('p')
             message_author = message_html.find('div', {'class': MESSAGE_AUTHOR_CLASS}).a.text
+            message_attachments = message_html.find('div', {'class': MESSAGE_ATTACHMENTS_CLASS})
+            message_need_to_knows = message_html.find('div', {'class': MESSAGE_NEED_TO_KNOW_CLASS})
 
             channel_item = SubElement(channel, 'item')
 
@@ -115,6 +121,19 @@ for page_element in enumerate(pages_li[:-2]):
             channel_item_description.text = ''
             for paragraph in message_paragraphs:
                 channel_item_description.text += str(paragraph).decode("utf8")
+
+            if message_attachments:
+                channel_item_description.text += '<h3>Attachment</h3>'
+
+                for attachment in message_attachments.find_all('span'):
+                    attachment.find('img')['src'] = IMAGE_PREFIX + attachment.find('img')['src']
+                    channel_item_description.text += str(attachment).decode("utf8")
+
+            if message_need_to_knows and message_need_to_knows.find_all('p'):
+                channel_item_description.text += '<h3>Need to know</h3>'
+
+                for need_to_know in message_need_to_knows.find_all('p'):
+                    channel_item_description.text += str(need_to_know).decode("utf8")
 
             channel_item_guid = SubElement(channel_item, 'guid')
             channel_item_guid.text = message_link
