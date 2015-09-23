@@ -1,8 +1,14 @@
+import time
 import mechanize
 import argparse
+from email import utils
 from bs4 import BeautifulSoup
 from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
+
+
+def date_to_rfc822(date):
+    return utils.formatdate(time.mktime(date.timetuple()), True)
 
 # Command line arguments
 parser = argparse.ArgumentParser()
@@ -63,10 +69,10 @@ channel_copyright = SubElement(channel, 'copyright')
 channel_copyright.text = 'Copyright UCLL'
 
 channel_publish_date = SubElement(channel, 'pubDate')
-channel_publish_date.text = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
+channel_publish_date.text = date_to_rfc822(datetime.now())
 
 channel_last_build_date = SubElement(channel, 'lastBuildDate')
-channel_last_build_date.text = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
+channel_last_build_date.text = date_to_rfc822(datetime.now())
 
 # HTML identifiers
 
@@ -84,8 +90,8 @@ PAGE_LI_CLASS = 'pager__item'
 messages_html = BeautifulSoup(br.open(MESSAGES_URL).read(), "html.parser")
 pages_li = messages_html.find('ul', {'class': PAGE_UL_CLASS}).find_all('li', {'class': PAGE_LI_CLASS})
 
-for page_index in enumerate(pages_li[:-2]):
-    messages_html = BeautifulSoup(br.open(MESSAGES_URL + '?page=' + str(page_index)).read(), "html.parser")
+for page_element in enumerate(pages_li[:-2]):
+    messages_html = BeautifulSoup(br.open(MESSAGES_URL + '?page=' + str(page_element[0])).read(), "html.parser")
     messages_h2 = messages_html.find('div', {'class': MESSAGES_DIV_CLASS}).find_all('h2')
     messages_date_div = messages_html.find_all('div', {'class': MESSAGES_DATE_DIV_CLASS})
 
@@ -114,8 +120,7 @@ for page_index in enumerate(pages_li[:-2]):
             channel_item_guid.text = message_link
 
             channel_item_publish_date = SubElement(channel_item, 'pubDate')
-            channel_item_publish_date.text = datetime.strptime(message_publish_date, '%d-%m-%Y')\
-                .strftime("%a, %d %b %Y %H:%M:%S %z")
+            channel_item_publish_date.text = date_to_rfc822(datetime.strptime(message_publish_date, '%d-%m-%Y'))
 
             channel_item_author = SubElement(channel_item, 'author')
             channel_item_author.text = message_author
@@ -124,3 +129,4 @@ for page_index in enumerate(pages_li[:-2]):
 rss_file = open("ucll.xml", 'w')
 rss_file.write(tostring(rss))
 rss_file.close()
+
