@@ -12,8 +12,9 @@ def date_to_rfc822(date):
 
 # Command line arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('-username', help='UCLL username')
-parser.add_argument('-password', help='UCLL password')
+parser.add_argument('-u', '--username', type=str, help='UCLL username', required=True)
+parser.add_argument('-p', '--password', type=str, help='UCLL password', required=True)
+parser.add_argument('-o', '--output', type=str, help='Output file path', required=True)
 args = parser.parse_args()
 
 # Browser
@@ -145,7 +146,7 @@ for page_element in enumerate(pages_li[:-2]):
             channel_item_author.text = message_author
 
 # Save XML to RSS file
-rss_file = open("ucll.xml", 'w')
+rss_file = open(args.output, 'w')
 rss_file.write(tostring(rss))
 rss_file.close()
 
