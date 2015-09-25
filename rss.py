@@ -1,6 +1,6 @@
 import time
-import mechanize
 import argparse
+import mechanize
 from email import utils
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -8,6 +8,9 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 
 
 def date_to_rfc822(date):
+    """
+        Converts a date to the RFC-822 standard
+    """
     return utils.formatdate(time.mktime(date.timetuple()), True)
 
 # Command line arguments
@@ -58,16 +61,13 @@ channel_description = SubElement(channel, 'description')
 channel_description.text = 'UC Leuven-Limburg : Nieuwsberichten'
 
 channel_link = SubElement(channel, 'link')
-channel_link.text = 'https://intranet.ucll.be/newsmessages'
+channel_link.text = 'https://intranet.ucll.be'
 
 channel_language = SubElement(channel, 'language')
 channel_language.text = 'nl-be'
 
-channel_generator = SubElement(channel, 'generator')
-channel_generator.text = 'https://github.com/DavidOpDeBeeck/UCLL-Intranet-RSS'
-
 channel_copyright = SubElement(channel, 'copyright')
-channel_copyright.text = 'Copyright UCLL'
+channel_copyright.text = 'Copyright UC Leuven-Limburg'
 
 channel_publish_date = SubElement(channel, 'pubDate')
 channel_publish_date.text = date_to_rfc822(datetime.now())
@@ -75,21 +75,38 @@ channel_publish_date.text = date_to_rfc822(datetime.now())
 channel_last_build_date = SubElement(channel, 'lastBuildDate')
 channel_last_build_date.text = date_to_rfc822(datetime.now())
 
-# HTML identifiers
+channel_generator = SubElement(channel, 'generator')
+channel_generator.text = 'https://github.com/DavidOpDeBeeck/UCLL-Intranet-RSS'
 
+channel_image = SubElement(channel, 'image')
+
+channel_image_url = SubElement(channel_image, 'url')
+channel_image_url.text = 'https://pbs.twimg.com/profile_images/525369285992919040/53mGKhKC.png'
+
+channel_image_title = SubElement(channel_image, 'title')
+channel_image_title.text = 'UC Leuven-Limburg logo'
+
+channel_image_link = SubElement(channel_image, 'link')
+channel_image_link.text = 'https://intranet.ucll.be'
+
+channel_image_width = SubElement(channel_image, 'width')
+channel_image_width.text = '180'
+
+channel_image_height = SubElement(channel_image, 'height')
+channel_image_height.text = '180'
+
+# HTML identifiers
 MESSAGES_URL = 'https://intranet.ucll.be/newsmessages'
 MESSAGES_DIV_CLASS = 'view-dringende-berichten-nieuwsberichten'
 MESSAGES_DATE_DIV_CLASS = 'field--name-post-date'
 
-MESSAGE_PREFIX_URL = 'https://intranet.ucll.be'
+MESSAGE_PREFIX_URL = IMAGE_PREFIX = 'https://intranet.ucll.be'
 MESSAGE_AUTHOR_CLASS = 'field--name-field-contact'
 MESSAGE_ATTACHMENTS_CLASS = 'field--name-field-nieuws-bijlage'
 MESSAGE_NEED_TO_KNOW_CLASS = 'field--name-field-nieuws-need-to-know'
 
 PAGE_UL_CLASS = 'pager'
 PAGE_LI_CLASS = 'pager__item'
-
-IMAGE_PREFIX = 'https://intranet.ucll.be'
 
 # HTML parsing
 messages_html = BeautifulSoup(br.open(MESSAGES_URL).read(), "html.parser")
@@ -120,19 +137,18 @@ for page_element in enumerate(pages_li[:-2]):
 
             channel_item_description = SubElement(channel_item, 'description')
             channel_item_description.text = ''
+
             for paragraph in message_paragraphs:
                 channel_item_description.text += str(paragraph).decode("utf8")
 
             if message_attachments:
                 channel_item_description.text += '<h3>Attachment</h3>'
-
                 for attachment in message_attachments.find_all('span'):
                     attachment.find('img')['src'] = IMAGE_PREFIX + attachment.find('img')['src']
                     channel_item_description.text += str(attachment).decode("utf8")
 
             if message_need_to_knows and message_need_to_knows.find_all('p'):
                 channel_item_description.text += '<h3>Need to know</h3>'
-
                 for need_to_know in message_need_to_knows.find_all('p'):
                     channel_item_description.text += str(need_to_know).decode("utf8")
 
