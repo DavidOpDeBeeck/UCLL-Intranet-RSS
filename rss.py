@@ -84,16 +84,16 @@ channel_image_url = SubElement(channel_image, 'url')
 channel_image_url.text = 'https://www.ucll.be/sites/all/themes/balance_theme/apple-touch-icon-precomposed-144x144.png'
 
 channel_image_title = SubElement(channel_image, 'title')
-channel_image_title.text = 'UC Leuven-Limburg logo'
+channel_image_title.text = 'UCLL Nieuwsberichten'
 
 channel_image_link = SubElement(channel_image, 'link')
 channel_image_link.text = 'https://intranet.ucll.be'
 
 channel_image_width = SubElement(channel_image, 'width')
-channel_image_width.text = '180'
+channel_image_width.text = '144'
 
 channel_image_height = SubElement(channel_image, 'height')
-channel_image_height.text = '180'
+channel_image_height.text = '144'
 
 # HTML identifiers
 MESSAGES_URL = 'https://intranet.ucll.be/newsmessages'
