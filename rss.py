@@ -81,7 +81,7 @@ channel_generator.text = 'https://github.com/DavidOpDeBeeck/UCLL-Intranet-RSS'
 channel_image = SubElement(channel, 'image')
 
 channel_image_url = SubElement(channel_image, 'url')
-channel_image_url.text = 'https://pbs.twimg.com/profile_images/525369285992919040/53mGKhKC.png'
+channel_image_url.text = 'https://www.ucll.be/sites/all/themes/balance_theme/apple-touch-icon-precomposed-144x144.png'
 
 channel_image_title = SubElement(channel_image, 'title')
 channel_image_title.text = 'UC Leuven-Limburg logo'
