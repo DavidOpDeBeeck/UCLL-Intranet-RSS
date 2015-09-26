@@ -1,7 +1,7 @@
 # UCLL Intranet RSS Feed
 A RSS feed for the messages on [intranet.ucll.be](https://intranet.ucll.be).
 
-## RSS generator
+## RSS Generator
 ```python
 python rss.py -u [UCLL username] -p [UCLL password] -o [Output File]
 ```
