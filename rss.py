@@ -88,9 +88,10 @@ messages_url = 'https://intranet.ucll.be/newsmessages'
 messages_class = 'view-dringende-berichten-nieuwsberichten'
 messages_date_class = 'field--name-post-date'
 
-message_prefix_url = image_prefix_url = 'https://intranet.ucll.be'
+message_prefix_url = image_prefix_url = link_prefix_url = 'https://intranet.ucll.be'
 message_author_class = 'field--name-field-contact'
 message_description_class = 'field--type-text-with-summary'
+message_description_item_class = 'field__item'
 message_attachments_class = 'field--name-field-nieuws-bijlage'
 message_ntk_class = 'field--name-field-nieuws-need-to-know'
 
@@ -111,7 +112,8 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             message_url = message_prefix_url + message_h2_element.a.get('href')
             message_html = BeautifulSoup(br.open(message_url).read(), "html.parser")
             message_publish_date = str(messages_date_div[messages_h2_index].find('div').find('div').text)[1:-1]
-            message_description = message_html.find('div', {'class': message_description_class}).children
+            message_description = message_html.find('div', {'class': message_description_class})\
+                .find_all('div', {'class': message_description_item_class})
             message_author = message_html.find('div', {'class': message_author_class}).a.text
             message_attachments = message_html.find('div', {'class': message_attachments_class})
             message_need_to_knows = message_html.find('div', {'class': message_ntk_class})
@@ -131,6 +133,10 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             channel_item_author.text = message_author
 
             for message_description_text in message_description:
+                message_description_links = message_description_text.find_all('a')
+                for message_description_link in message_description_links:  # If link is relative add prefix
+                    if message_description_link and message_description_link['href'][0] == '/':
+                        message_description_link['href'] = link_prefix_url + message_description_link['href']
                 channel_item_description.text += str(message_description_text).decode("utf8")
 
             if message_attachments:  # Only add attachments if found
