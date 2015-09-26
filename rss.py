@@ -1,10 +1,14 @@
 import time
+import sys
 import argparse
 import mechanize
 from email import utils
 from bs4 import BeautifulSoup
 from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
+
+reload(sys)
+sys.setdefaultencoding("utf8")
 
 
 def date_to_rfc822(date):
@@ -86,6 +90,7 @@ messages_date_class = 'field--name-post-date'
 
 message_prefix_url = image_prefix_url = 'https://intranet.ucll.be'
 message_author_class = 'field--name-field-contact'
+message_description_class = 'field--type-text-with-summary'
 message_attachments_class = 'field--name-field-nieuws-bijlage'
 message_ntk_class = 'field--name-field-nieuws-need-to-know'
 
@@ -106,7 +111,7 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             message_url = message_prefix_url + message_h2_element.a.get('href')
             message_html = BeautifulSoup(br.open(message_url).read(), "html.parser")
             message_publish_date = str(messages_date_div[messages_h2_index].find('div').find('div').text)[1:-1]
-            message_paragraphs = message_html.find('article').find_all('p')
+            message_description = message_html.find('div', {'class': message_description_class}).text
             message_author = message_html.find('div', {'class': message_author_class}).a.text
             message_attachments = message_html.find('div', {'class': message_attachments_class})
             message_need_to_knows = message_html.find('div', {'class': message_ntk_class})
@@ -121,12 +126,9 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
 
             channel_item_title.text = message_h2_element.a.text
             channel_item_link.text = channel_item_guid.text = message_url
-            channel_item_description.text = ''
+            channel_item_description.text = message_description.decode("utf8")
             channel_item_publish_date.text = date_to_rfc822(datetime.strptime(message_publish_date, '%d-%m-%Y'))
             channel_item_author.text = message_author
-
-            for paragraph in message_paragraphs:
-                channel_item_description.text += str(paragraph).decode("utf8")
 
             if message_attachments:  # Only add attachments if found
                 channel_item_description.text += '<h3>Attachment</h3>'
