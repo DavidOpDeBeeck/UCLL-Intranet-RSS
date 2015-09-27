@@ -113,8 +113,9 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             message_url = message_prefix_url + message_h2_element.a.get('href')
             message_html = BeautifulSoup(br.open(message_url).read(), "html.parser")
             message_publish_date = str(messages_date_div[messages_h2_index].find('div').find('div').text)[1:-1]
-            message_description = message_html.find('div', {'class': message_description_class})\
-                .find_all('div', {'class': message_description_item_class})
+            message_description = message_html.find(
+                'div', {'class': message_description_class}).find_all(
+                'div', {'class': message_description_item_class})
             message_author = message_html.find('div', {'class': message_author_class}).a.text
             message_attachments = message_html.find('div', {'class': message_attachments_class})
             message_need_to_knows = message_html.find('div', {'class': message_ntk_class})
@@ -134,12 +135,13 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             channel_item_publish_date.text = date_to_rfc822(datetime.strptime(message_publish_date, '%d-%m-%Y'))
             channel_item_author.text = message_author
 
-            for message_description_text in message_description:
-                message_description_links = message_description_text.find_all('a')
-                for message_description_link in message_description_links:  # If link is relative add prefix
-                    if message_description_link and message_description_link['href'][0] == '/':
-                        message_description_link['href'] = link_prefix_url + message_description_link['href']
-                channel_item_description.text += str(message_description_text).decode("utf8")
+            for message_description_item in message_description:
+                for message_description_text in message_description_item.find_all():
+                    message_description_links = message_description_text.find_all('a')
+                    for message_description_link in message_description_links:  # If link is relative add prefix
+                        if message_description_link and message_description_link['href'][0] == '/':
+                            message_description_link['href'] = link_prefix_url + message_description_link['href']
+                    channel_item_description.text += str(message_description_text).decode("utf8")
 
             if message_attachments:  # Only add attachments if found
                 channel_item_description.text += '<h3>Attachment</h3>'
