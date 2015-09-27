@@ -88,12 +88,13 @@ messages_url = 'https://intranet.ucll.be/newsmessages'
 messages_class = 'view-dringende-berichten-nieuwsberichten'
 messages_date_class = 'field--name-post-date'
 
-message_prefix_url = image_prefix_url = link_prefix_url = 'https://intranet.ucll.be'
+message_prefix_url = image_prefix_url = link_prefix_url = category_prefix_url = 'https://intranet.ucll.be'
 message_author_class = 'field--name-field-contact'
 message_description_class = 'field--type-text-with-summary'
 message_description_item_class = 'field__item'
 message_attachments_class = 'field--name-field-nieuws-bijlage'
 message_ntk_class = 'field--name-field-nieuws-need-to-know'
+message_category_class = 'field--name-field-tags'
 
 page_list_class = 'pager'
 page_item_class = 'pager__item'
@@ -117,6 +118,7 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             message_author = message_html.find('div', {'class': message_author_class}).a.text
             message_attachments = message_html.find('div', {'class': message_attachments_class})
             message_need_to_knows = message_html.find('div', {'class': message_ntk_class})
+            message_categories = message_html.find('div', {'class': message_category_class})
 
             channel_item = SubElement(channel, 'item')
             channel_item_title = SubElement(channel_item, 'title')
@@ -149,6 +151,12 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
                 channel_item_description.text += '<h3>Need to know</h3>'
                 for need_to_know in message_need_to_knows.find_all('p'):
                     channel_item_description.text += str(need_to_know).decode("utf8")
+
+            if message_categories and message_categories.find_all('a'):  # Only add categories if found
+                for message_category in message_categories.find_all('a'):
+                    channel_item_category = SubElement(channel_item, 'category',
+                                                       domain=category_prefix_url + message_category['href'])
+                    channel_item_category.text = message_category.text
 
 output_file = open(args.output, 'w')
 output_file.write(tostring(rss))
