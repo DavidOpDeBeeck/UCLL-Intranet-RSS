@@ -136,7 +136,7 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             channel_item_author.text = message_author
 
             for message_description_item in message_description:
-                for message_description_text in message_description_item.find_all():
+                for message_description_text in message_description_item.find_all(recursive=False):
                     message_description_links = message_description_text.find_all('a')
                     for message_description_link in message_description_links:  # If link is relative add prefix
                         if message_description_link and message_description_link['href'][0] == '/':
