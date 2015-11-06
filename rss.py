@@ -10,7 +10,6 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 reload(sys)
 sys.setdefaultencoding("utf8")
 
-
 def date_to_rfc822(date):
     """
         Converts a date to the RFC-822 standard
@@ -113,9 +112,12 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
             message_url = message_prefix_url + message_h2_element.a.get('href')
             message_html = BeautifulSoup(br.open(message_url).read(), "html.parser")
             message_publish_date = str(messages_date_div[messages_h2_index].find('div').find('div').text)[1:-1]
-            message_description = message_html.find(
-                'div', {'class': message_description_class}).find_all(
-                'div', {'class': message_description_item_class})
+            try:
+                message_description = message_html.find(
+                    'div', {'class': message_description_class}).find_all(
+                    'div', {'class': message_description_item_class})
+            except AttributeError:
+                message_description = []
             message_author = message_html.find('div', {'class': message_author_class}).a.text
             message_attachments = message_html.find('div', {'class': message_attachments_class})
             message_need_to_knows = message_html.find('div', {'class': message_ntk_class})
@@ -163,4 +165,3 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
 output_file = open(args.output, 'w')
 output_file.write(tostring(rss))
 output_file.close()
-
