@@ -143,7 +143,7 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
                     for message_description_link in message_description_links:  # If link is relative add prefix
                         if message_description_link and message_description_link['href'][0] == '/':
                             message_description_link['href'] = link_prefix_url + message_description_link['href']
-                    channel_item_description.text += str(message_description_text).decode("utf8")
+                    channel_item_description.text += str(message_description_text).decode("utf8").replace("</p>", "</p> ").replace("<br/>", "<br/> ")
 
             if message_attachments:  # Only add attachments if found
                 channel_item_description.text += '<h3>Attachment</h3>'
