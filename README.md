@@ -13,7 +13,7 @@ python rss.py -u [UCLL username] -p [UCLL password] -o [Output File] -i [Initial
 | u  | String  | Your UCLL username (r-number)  | Content Cell  |
 | p  | String  | Your UCLL password  | Content Cell  |
 | o  | String  | The absolute or relative path to the output file. If it doesn't exist it will be created  | Content Cell  |
-| i  | Boolean  | When you set this value to True the database will be created. All the items untill now will be fetched and inserted into the database. **It is important that you set this value the first time and that you set it back to False or just remove from the line after the first time.**  | False  |
+| i  | Boolean  | When you set this value to True the database will be created. All the items until now will be fetched and inserted into the database. **It is important that you set this value the first time and that you set it back to False or just remove from the line after the first time.**  | False  |
 
 ## RSS Feed
 [rss.davidopdebeeck.be/ucll-slack.xml](http://rss.davidopdebeeck.be/ucll-slack.xml)
