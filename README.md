@@ -1,5 +1,5 @@
 # UCLL Intranet RSS Feed
-A Slack RSS feed for the messages on [intranet.ucll.be](https://intranet.ucll.be).
+A RSS feed for the messages on [intranet.ucll.be](https://intranet.ucll.be).
 
 The slack branch has &lt;p&gt; and &lt;/br&gt; elements included in the description for formatting.
 
@@ -16,4 +16,4 @@ python rss.py -u [UCLL username] -p [UCLL password] -o [Output File] -i [Initial
 | i  | Boolean  | When you set this value to True the database will be created. All the items until now will be fetched and inserted into the database. **It is important that you set this value the first time and that you set it back to False or just remove from the line after the first time.**  | No  |
 
 ## RSS Feed
-[rss.davidopdebeeck.be/ucll-slack.xml](http://rss.davidopdebeeck.be/ucll-slack.xml)
+[rss.davidopdebeeck.be/ucll.xml](http://rss.davidopdebeeck.be/ucll.xml)
