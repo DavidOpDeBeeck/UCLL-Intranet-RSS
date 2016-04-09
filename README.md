@@ -1,7 +1,7 @@
 # UCLL Intranet RSS Feed
 A RSS feed for the messages on [intranet.ucll.be](https://intranet.ucll.be).
 
-The slack branch has &lt;p&gt; and &lt;/br&gt; elements included in the description for formatting.
+The slack branch has spaces after &lt;p&gt; and &lt;/br&gt; elements for formatting.
 
 ## RSS Generator
 ```python
