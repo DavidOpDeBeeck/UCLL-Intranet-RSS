@@ -15,5 +15,6 @@ python rss.py -u [UCLL username] -p [UCLL password] -o [Output File] -i [Initial
 | o  | String  | The absolute or relative path to the output file. If it doesn't exist it will be created  | Yes  |
 | i  | Boolean  | When you set this value to True the database will be created. All the items until now will be fetched and inserted into the database. **It is important that you set this value the first time and that you set it back to False or just remove from the line after the first time.**  | No  |
 
-## RSS Feed
+## RSS Feeds
 [rss.davidopdebeeck.be/ucll.xml](http://rss.davidopdebeeck.be/ucll.xml)
+[rss.davidopdebeeck.be/ucll-slack.xml](http://rss.davidopdebeeck.be/ucll-slack.xml)

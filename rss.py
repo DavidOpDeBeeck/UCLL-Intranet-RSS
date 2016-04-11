@@ -171,7 +171,7 @@ channel_image_width.text = channel_image_height.text = '57'
 
 
 for index, item in  enumerate(database.get_all_items()):
-    if index == 1:
+    if index == 0:
         channel_last_build_date.text = date_to_rfc822(datetime.fromtimestamp(int(item['pubDate'])))
     channel_item = SubElement(channel, 'item')
     channel_item_title = SubElement(channel_item, 'title')
