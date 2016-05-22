@@ -18,11 +18,21 @@ def date_to_rfc822(date):
     """
     return utils.formatdate(time.mktime(date.timetuple()), True)
 
+
+def format_text(txt):
+    """
+        Formats a text using the specified format
+    """
+    if args.format == 1:
+        return txt.replace("</p>", "</p> ").replace("<br/>", "<br/> ")
+    return txt
+
 # Command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-u', '--username', type=str, help='UCLL username', required=True)
 parser.add_argument('-p', '--password', type=str, help='UCLL password', required=True)
 parser.add_argument('-o', '--output', type=str, help='Output file path', required=True)
+parser.add_argument('-f', '--format', type=int, help='Format of the output file', required=False, default=0)
 parser.add_argument('-i', '--initialise', type=bool, help='Initialises the database and scrapes all items', required=False, default=False)
 args = parser.parse_args()
 
@@ -170,7 +180,7 @@ channel_image_url.text = 'https://www.ucll.be/sites/all/themes/balance_theme/app
 channel_image_width.text = channel_image_height.text = '57'
 
 
-for index, item in  enumerate(database.get_all_items()):
+for index, item in enumerate(database.get_all_items()):
     if index == 0:
         channel_last_build_date.text = date_to_rfc822(datetime.fromtimestamp(int(item['pubDate'])))
     channel_item = SubElement(channel, 'item')
@@ -183,13 +193,12 @@ for index, item in  enumerate(database.get_all_items()):
 
     channel_item_title.text = item['title']
     channel_item_link.text = channel_item_guid.text = item['guid']
-    channel_item_description.text = item['description']
+    channel_item_description.text = format_text(item['description'])
     channel_item_publish_date.text = date_to_rfc822(datetime.fromtimestamp(int(item['pubDate'])))
     channel_item_author.text = item['author']
 
     for (url, text) in item['categories']:
-        channel_item_category = SubElement(channel_item, 'category',
-                                           domain=url)
+        channel_item_category = SubElement(channel_item, 'category', domain=url)
         channel_item_category.text = text
 
 
