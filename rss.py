@@ -127,7 +127,7 @@ for page_element in enumerate(page_items_html[:-2]):  # Remove 'volgende' and 'l
                     for message_description_text in message_description_item.find_all(recursive=False):
                         message_description_links = message_description_text.find_all('a')
                         for message_description_link in message_description_links:  # If link is relative add prefix
-                            if message_description_link and message_description_link['href'][0] == '/':
+                            if message_description_link and 'href' in message_description_link and message_description_link['href'][0] == '/':
                                 message_description_link['href'] = link_prefix_url + message_description_link['href']
                         description += str(message_description_text).decode("utf8")
 
