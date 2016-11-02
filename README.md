@@ -36,8 +36,3 @@ The format of the output file. To support the RSS feed feature in Slack we provi
 When you set this value to `true` the database will be created. All the items until now will be fetched and inserted into the database. 
 
 **Note** : It is important that you set this value the first time and that you set it back to `false` or just remove from the line after the first time.
-
-## RSS Feeds
-
-[rss.davidopdebeeck.be/ucll.xml](http://rss.davidopdebeeck.be/ucll.xml)  
-[rss.davidopdebeeck.be/ucll-slack.xml](http://rss.davidopdebeeck.be/ucll-slack.xml)
